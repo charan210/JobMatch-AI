@@ -36,7 +36,7 @@ class JobRepository(BaseRepository[Job]):
             query = query.where(Job.status == status)
         query = query.order_by(Job.created_at.desc() if sort_desc else Job.created_at.asc())
         result = await db.execute(query)
-        return result.scalars().all()
+        return list(result.scalars().all())
 
     async def get_by_ids(
         self,
@@ -45,4 +45,4 @@ class JobRepository(BaseRepository[Job]):
     ) -> list[Job]:
         query = select(Job).where(Job.id.in_(job_ids))
         result = await db.execute(query)
-        return result.scalars().all()
+        return list(result.scalars().all())

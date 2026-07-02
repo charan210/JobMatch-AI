@@ -44,14 +44,19 @@ class CandidateScoreRepository(BaseRepository[CandidateScore]):
         missing_skills: list[str] | None,
         recommendation: str | None,
     ) -> CandidateScore:
+        def to_decimal(val: float | Decimal | None) -> Decimal | None:
+            if val is None:
+                return None
+            return Decimal(str(val))
+
         existing = await self.get_by_candidate_and_job(db, candidate_id, job_id)
         if existing is not None:
-            existing.skill_score = skill_score
-            existing.experience_score = experience_score
-            existing.education_score = education_score
-            existing.semantic_score = semantic_score
-            existing.ai_score = ai_score
-            existing.final_score = final_score
+            existing.skill_score = to_decimal(skill_score)
+            existing.experience_score = to_decimal(experience_score)
+            existing.education_score = to_decimal(education_score)
+            existing.semantic_score = to_decimal(semantic_score)
+            existing.ai_score = to_decimal(ai_score)
+            existing.final_score = to_decimal(final_score)
             existing.rank_position = rank_position
             existing.matched_skills = matched_skills
             existing.missing_skills = missing_skills
@@ -62,12 +67,12 @@ class CandidateScoreRepository(BaseRepository[CandidateScore]):
         record = CandidateScore(
             candidate_id=candidate_id,
             job_id=job_id,
-            skill_score=skill_score,
-            experience_score=experience_score,
-            education_score=education_score,
-            semantic_score=semantic_score,
-            ai_score=ai_score,
-            final_score=final_score,
+            skill_score=to_decimal(skill_score),
+            experience_score=to_decimal(experience_score),
+            education_score=to_decimal(education_score),
+            semantic_score=to_decimal(semantic_score),
+            ai_score=to_decimal(ai_score),
+            final_score=to_decimal(final_score),
             rank_position=rank_position,
             matched_skills=matched_skills,
             missing_skills=missing_skills,

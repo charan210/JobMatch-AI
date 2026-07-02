@@ -43,7 +43,7 @@ class BaseRepository(Generic[ModelType]):
         options: list[Any] | None = None,
     ) -> ModelType | None:
         try:
-            query = select(self.model).where(self.model.id == model_id)
+            query = select(self.model).where(getattr(self.model, "id") == model_id)
             if options:
                 for option in options:
                     query = query.options(option)
@@ -82,7 +82,10 @@ class BaseRepository(Generic[ModelType]):
         filters: dict[str, Any] | FilterParams | None = None,
     ) -> bool:
         try:
-            query = select(sa.exists().where(self._build_filter_clause(filters)))
+            clause = self._build_filter_clause(filters)
+            if clause is None:
+                clause = sa.true()
+            query = select(sa.exists().where(clause))
             result = await db.execute(query)
             return bool(result.scalar())
         except sa.exc.SQLAlchemyError as exc:
@@ -133,7 +136,7 @@ class BaseRepository(Generic[ModelType]):
             page_size = page_params.page_size if page_params else 25
             offset = (page - 1) * page_size
             result = await db.execute(query.limit(page_size).offset(offset))
-            items = result.scalars().all()
+            items = list(result.scalars().all())
             total = await self.count(db, filters=filters)
             return PaginatedResult.create(
                 items=items,

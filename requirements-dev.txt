@@ -1,0 +1,2 @@
+types-python-jose
+types-passlib
