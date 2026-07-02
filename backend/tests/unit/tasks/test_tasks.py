@@ -35,7 +35,7 @@ async def test_generate_ranking_task_success(monkeypatch, async_session: AsyncSe
 
     class FakeRankingService:
         async def generate_ranking(self, db, jid):
-            assert jid == job_id
+            assert str(jid) == job_id
 
     def fake_get_db_context():
         class DummyContext:

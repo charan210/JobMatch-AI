@@ -28,7 +28,8 @@ if celery_app is not None:
 
                 ranking_service = RankingService()
                 try:
-                    await ranking_service.generate_ranking(db, job_id)
+                    import uuid
+                    await ranking_service.generate_ranking(db, uuid.UUID(job_id))
                     if job:
                         job.status = "COMPLETED"
                         job.completed_at = func.now()  # type: ignore

@@ -44,7 +44,7 @@ class JobSkillRepository(BaseRepository[JobSkill]):
     ) -> list[JobSkill]:
         query = select(JobSkill).where(JobSkill.job_id == job_id)
         result = await db.execute(query)
-        return result.scalars().all()
+        return list(result.scalars().all())
 
     async def list_by_skill(
         self,
@@ -53,7 +53,7 @@ class JobSkillRepository(BaseRepository[JobSkill]):
     ) -> list[JobSkill]:
         query = select(JobSkill).where(JobSkill.skill_id == skill_id)
         result = await db.execute(query)
-        return result.scalars().all()
+        return list(result.scalars().all())
 
     async def get_by_ids(
         self,
@@ -62,4 +62,4 @@ class JobSkillRepository(BaseRepository[JobSkill]):
     ) -> list[JobSkill]:
         query = select(JobSkill).where(JobSkill.id.in_(job_skill_ids))
         result = await db.execute(query)
-        return result.scalars().all()
+        return list(result.scalars().all())

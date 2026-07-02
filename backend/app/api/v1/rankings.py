@@ -15,8 +15,10 @@ logger = get_logger(__name__)
 router = APIRouter(prefix="/rankings", tags=["Rankings"])
 
 
+from typing import Any
+
 @router.post("/generate/{job_id}", status_code=status.HTTP_202_ACCEPTED)
-async def generate_ranking(job_id: UUID, db: AsyncSession = Depends(get_db)) -> dict:
+async def generate_ranking(job_id: UUID, db: AsyncSession = Depends(get_db)) -> dict[str, Any]:
     # Ensure job exists
     from app.models.job import Job
     from app.tasks.celery_app import celery_app
@@ -69,14 +71,15 @@ async def generate_ranking(job_id: UUID, db: AsyncSession = Depends(get_db)) -> 
 
 
 @router.get("/{job_id}", status_code=status.HTTP_200_OK)
-async def get_rankings(job_id: UUID, db: AsyncSession = Depends(get_db)) -> list[dict]:
+async def get_rankings(job_id: UUID, db: AsyncSession = Depends(get_db)) -> list[dict[str, Any]]:
     # Returns persisted candidate_scores for a job sorted by final_score desc
     repo = CandidateScoreRepository()
+    from sqlalchemy import text
     query = await db.execute(
-        "SELECT * FROM candidate_scores WHERE job_id = :job_id ORDER BY final_score DESC, candidate_id ASC",
+        text("SELECT * FROM candidate_scores WHERE job_id = :job_id ORDER BY final_score DESC, candidate_id ASC"),
         {"job_id": str(job_id)},
     )
-    rows = query.fetchall()
+    rows = query.mappings().fetchall()
     results = []
     for row in rows:
         # row is RowMapping; map expected fields
@@ -90,7 +93,7 @@ async def get_rankings(job_id: UUID, db: AsyncSession = Depends(get_db)) -> list
 
 
 @router.get("/{job_id}/{candidate_id}", status_code=status.HTTP_200_OK)
-async def get_score_breakdown(job_id: UUID, candidate_id: UUID, db: AsyncSession = Depends(get_db)) -> dict:
+async def get_score_breakdown(job_id: UUID, candidate_id: UUID, db: AsyncSession = Depends(get_db)) -> dict[str, Any]:
     repo = CandidateScoreRepository()
     record = await repo.get_by_candidate_and_job(db, candidate_id, job_id)
     if record is None:

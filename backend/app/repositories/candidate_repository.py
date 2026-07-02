@@ -31,7 +31,7 @@ class CandidateRepository(BaseRepository[Candidate]):
     ) -> list[Candidate]:
         query = select(Candidate).where(Candidate.email.in_(emails))
         result = await db.execute(query)
-        return result.scalars().all()
+        return list(result.scalars().all())
 
     async def get_by_email(
         self,
