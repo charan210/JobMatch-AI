@@ -31,7 +31,7 @@ class ResumeRepository(BaseRepository[Resume]):
     ) -> list[Resume]:
         query = select(Resume).where(Resume.candidate_id == candidate_id)
         result = await db.execute(query)
-        return result.scalars().all()
+        return list(result.scalars().all())
 
     async def get_by_ids(
         self,
@@ -40,4 +40,4 @@ class ResumeRepository(BaseRepository[Resume]):
     ) -> list[Resume]:
         query = select(Resume).where(Resume.id.in_(resume_ids))
         result = await db.execute(query)
-        return result.scalars().all()
+        return list(result.scalars().all())

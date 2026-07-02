@@ -76,7 +76,7 @@ async def list_jobs(
     service: JobService = Depends(get_job_service),
 ) -> list[JobResponse]:
     items, _ = await service.list_jobs(db, status=status, page=page, page_size=page_size)
-    return items
+    return [JobResponse.model_validate(item) for item in items]
 
 
 @router.get("/{job_id}", response_model=JobResponse, status_code=status.HTTP_200_OK)
@@ -89,7 +89,7 @@ async def get_job(
         job = await service.get_job(db, job_id)
     except NotFoundError as exc:
         raise HTTPException(status_code=exc.status_code, detail=exc.message)
-    return job
+    return JobResponse.model_validate(job)
 
 
 @router.put("/{job_id}", response_model=JobResponse, status_code=status.HTTP_200_OK)
@@ -107,7 +107,7 @@ async def update_job(
         )
     except NotFoundError as exc:
         raise HTTPException(status_code=exc.status_code, detail=exc.message)
-    return job
+    return JobResponse.model_validate(job)
 
 
 @router.delete("/{job_id}", status_code=status.HTTP_200_OK)

@@ -67,7 +67,7 @@ async def list_candidates(
     service: CandidateService = Depends(get_candidate_service),
 ) -> list[CandidateResponse]:
     items, _ = await service.list_candidates(db, page=page, page_size=page_size)
-    return items
+    return [CandidateResponse.model_validate(item) for item in items]
 
 
 @router.get("/{candidate_id}", response_model=CandidateResponse, status_code=status.HTTP_200_OK)
@@ -80,4 +80,4 @@ async def get_candidate(
         candidate = await service.get_candidate(db, candidate_id)
     except NotFoundError as exc:
         raise HTTPException(status_code=exc.status_code, detail=exc.message)
-    return candidate
+    return CandidateResponse.model_validate(candidate)

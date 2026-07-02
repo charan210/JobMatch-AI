@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional
 
-from fastapi import FastAPI, HTTPException, Request, status
+from fastapi import FastAPI, HTTPException, Request, Response, status
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.responses import JSONResponse
@@ -83,8 +83,8 @@ def _error_response(
 
 async def _handle_aras_exception(
     request: Request,
-    exc: ARASBaseException,
-) -> JSONResponse:
+    exc: Any,
+) -> Response:
     logger.warning(
         "aras_exception",
         path=request.url.path,
@@ -97,8 +97,8 @@ async def _handle_aras_exception(
 
 async def _handle_http_exception(
     request: Request,
-    exc: HTTPException,
-) -> JSONResponse:
+    exc: Any,
+) -> Response:
     logger.warning(
         "http_exception",
         path=request.url.path,
@@ -111,8 +111,8 @@ async def _handle_http_exception(
 
 async def _handle_validation_exception(
     request: Request,
-    exc: RequestValidationError,
-) -> JSONResponse:
+    exc: Any,
+) -> Response:
     errors = [
         {
             "field": " → ".join(str(loc) for loc in error["loc"]),
@@ -136,7 +136,7 @@ async def _handle_validation_exception(
 async def _handle_unhandled_exception(
     request: Request,
     exc: Exception,
-) -> JSONResponse:
+) -> Response:
     logger.error(
         "unhandled_exception",
         path=request.url.path,

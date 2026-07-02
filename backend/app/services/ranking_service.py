@@ -90,8 +90,8 @@ class RankingService:
             await self.calculate_candidate_score(db, candidate_id, job_id)
 
         # Assign rank positions
-        result = await db.execute(select(CandidateScore).where(CandidateScore.job_id == job_id))
-        scores = list(result.scalars().all())
+        scores_result = await db.execute(select(CandidateScore).where(CandidateScore.job_id == job_id))
+        scores = list(scores_result.scalars().all())
         # sort by final_score desc, then candidate_id asc
         scores.sort(key=lambda s: (-float(s.final_score or 0.0), str(s.candidate_id)))
         for idx, score in enumerate(scores, start=1):

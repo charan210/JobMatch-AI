@@ -33,7 +33,7 @@ async def register(
     """
     # Using register() as specified in the prompt since there's no existing alternative.
     user = await auth_service.register(db, request)
-    return user
+    return UserResponse.model_validate(user)
 
 
 @router.post(

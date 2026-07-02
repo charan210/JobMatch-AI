@@ -26,7 +26,8 @@ async def get_me(
     """
     Get the currently authenticated user's profile.
     """
-    return await user_service.get_user_profile(db, current_user.id)
+    user = await user_service.get_user_profile(db, current_user.id)
+    return UserResponse.model_validate(user)
 
 
 @router.put(
@@ -43,4 +44,5 @@ async def update_me(
     """
     Update the currently authenticated user's profile.
     """
-    return await user_service.update_user_profile(db, current_user.id, update_data)
+    user = await user_service.update_user_profile(db, current_user.id, update_data)
+    return UserResponse.model_validate(user)
