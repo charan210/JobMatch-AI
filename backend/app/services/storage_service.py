@@ -27,6 +27,13 @@ class StorageBackend(ABC):
         """
         pass
 
+    @abstractmethod
+    async def get_file(self, file_url: str) -> BinaryIO:
+        """
+        Retrieves a file by its URL or path.
+        """
+        pass
+
 
 class LocalStorageBackend(StorageBackend):
     def __init__(self, base_dir: str = settings.LOCAL_STORAGE_DIR) -> None:
@@ -52,12 +59,21 @@ class LocalStorageBackend(StorageBackend):
             file_path.unlink()
             logger.debug("file_deleted_locally", path=str(file_path))
 
+    async def get_file(self, file_url: str) -> BinaryIO:
+        file_path = Path(file_url)
+        if not file_path.exists() or not file_path.is_file():
+            raise FileNotFoundError(f"File not found: {file_url}")
+        return open(file_path, "rb")
+
 
 class S3StorageBackend(StorageBackend):
     async def save_file(self, filename: str, file_obj: BinaryIO) -> str:
         raise NotImplementedError("S3 storage is not yet implemented")
 
     async def delete_file(self, file_url: str) -> None:
+        raise NotImplementedError("S3 storage is not yet implemented")
+
+    async def get_file(self, file_url: str) -> BinaryIO:
         raise NotImplementedError("S3 storage is not yet implemented")
 
 

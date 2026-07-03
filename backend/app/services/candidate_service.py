@@ -39,3 +39,37 @@ class CandidateService:
             page_params=page_params,
         )
         return paginated.items, paginated.total
+
+    async def update_candidate_from_parsing(
+        self,
+        db: AsyncSession,
+        candidate_id: object,
+        contacts: dict[str, Any],
+        skills: list[str],
+    ) -> Candidate:
+        from app.repositories.skill_repository import SkillRepository
+        from app.repositories.candidate_skill_repository import CandidateSkillRepository
+        
+        candidate = await self.get_candidate(db, candidate_id)
+        
+        update_data = {}
+        if contacts.get("email") and not candidate.email:
+            update_data["email"] = contacts["email"]
+        if contacts.get("phone") and not candidate.phone:
+            update_data["phone"] = contacts["phone"]
+        if contacts.get("linkedin") and not candidate.linkedin_url:
+            update_data["linkedin_url"] = contacts["linkedin"]
+            
+        if update_data:
+            candidate = await self.repository.update(db, candidate, update_data)
+            
+        skill_repo = SkillRepository()
+        cs_repo = CandidateSkillRepository()
+        
+        for skill_val in skills:
+            skill = await skill_repo.get_or_create(db, skill_name=skill_val, category="extracted")
+            existing_cs = await cs_repo.get_by_candidate_and_skill(db, candidate.id, skill.id)
+            if not existing_cs:
+                await cs_repo.create(db, {"candidate_id": candidate.id, "skill_id": skill.id})
+                
+        return candidate
