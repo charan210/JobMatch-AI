@@ -30,7 +30,9 @@ Thumbs.db
 
 # Alembic
 *.db
+uploads/
 
 # Cache
 .mypy_cache/
 .ruff_cache/
+*.egg-info/

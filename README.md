@@ -6,20 +6,21 @@
 
 ## Project Status
 
-**Current Phase:** Day 1–3 Verification (Audit)
+**Current Phase:** Core AI & Async Pipeline Development
 
-**Version:** v0.1.0
-
-**Branch:** `audit/day1-day3`
+**Version:** v0.2.0
 
 **Development Status:**
 
 - ✅ Project Foundation
 - ✅ Backend Architecture
 - ✅ Database Models
-- ✅ Documentation
-- 🔄 Day 1–3 Verification
-- ⏳ Day 4 Development
+- ✅ Authentication & User Management
+- ✅ Resume Upload API
+- ✅ Async Job Architecture (Celery + Redis)
+- ✅ Resume Parsing Pipeline (AI Engine)
+- ✅ PostgreSQL + pgvector Integration
+- ⏳ Semantic Candidate Matching
 
 ---
 
@@ -29,19 +30,19 @@
 
 - FastAPI Backend Foundation
 - React + TypeScript Frontend
-- PostgreSQL Database
-- SQLAlchemy ORM
-- Alembic Migrations
-- Repository Pattern
-- Clean Architecture
-- Modular AI Engine
+- PostgreSQL Database + pgvector
+- SQLAlchemy ORM & Alembic Migrations
+- Repository & Clean Architecture
+- Authentication & User Management
+- Resume Upload API
+- Async Job Architecture (Celery + Redis)
+- Modular AI Engine (Resume Parsing Pipeline)
 - Docker Support
 - GitHub Actions CI
 - Comprehensive Project Documentation
 
 ## Planned
 
-- Resume Parsing
 - Job Description Analysis
 - Semantic Candidate Matching
 - AI Candidate Ranking
@@ -62,8 +63,10 @@
 - FastAPI
 - SQLAlchemy
 - Alembic
-- PostgreSQL
+- PostgreSQL + pgvector
 - Pydantic
+- Celery
+- Redis
 
 ## Frontend
 
@@ -75,7 +78,6 @@
 
 - Sentence Transformers
 - Gemini API
-- pgvector
 - PyMuPDF
 - pdfplumber
 
@@ -92,12 +94,12 @@
 ```text
 AI-Recruitment-System/
 │
-├── ai_engine/
-├── backend/
-├── frontend/
-├── deployment/
-├── docs/
-├── tests/
+├── ai_engine/          # Modular AI services and parsing pipeline
+├── backend/            # FastAPI backend, Celery workers, and async jobs
+├── frontend/           # React + TypeScript UI
+├── deployment/         # Docker Compose and deployment configs
+├── docs/               # Project specifications and architecture
+├── tests/              # E2E and integration tests
 │
 ├── CONTRIBUTING.md
 ├── Makefile
@@ -133,7 +135,7 @@ AI-Recruitment-System/
 - Risk Assessment
 - AI Validation Plan
 
-## Audit
+## Validation
 
 - PROJECT_IMPLEMENTATION_STATUS.md
 - AUDIT_CHECKLIST.md
@@ -162,12 +164,23 @@ python -m venv .venv
 .venv\Scripts\activate
 
 pip install -r requirements.txt
+pip install -e ../ai_engine
 ```
 
-Run:
+Run FastAPI Server:
 
 ```bash
 uvicorn app.main:app --reload
+```
+
+Run Celery Worker:
+
+```bash
+# Linux/macOS
+celery -A app.tasks.celery_app worker -Q default,ai --loglevel=info
+
+# Windows
+celery -A app.tasks.celery_app worker -P solo -Q default,ai --loglevel=info
 ```
 
 ---
@@ -198,57 +211,28 @@ docker compose -f deployment/docker-compose.yml up --build
 Frontend
       │
       ▼
-FastAPI API Layer
+FastAPI API Layer  <───> Redis (Message Broker)
+      │                     │
+      ▼                     ▼
+Services              Celery Workers
+      │                     │
+      ▼                     ▼
+Repositories          AI Engine (Resume Parsing)
       │
       ▼
-Services
-      │
-      ▼
-Repositories
-      │
-      ▼
-PostgreSQL
-
-             │
-             ▼
-
-AI Engine
-
-Resume Parser
-
-↓
-
-Skill Extraction
-
-↓
-
-Embeddings
-
-↓
-
-Matching
-
-↓
-
-Ranking
-
-↓
-
-LLM Intelligence
+PostgreSQL + pgvector
 ```
 
 ---
 
 # Development Workflow
 
-```
+```text
 main
 │
 develop
 │
 feature/*
-│
-audit/*
 │
 fix/*
 ```
@@ -264,28 +248,24 @@ Backend
 ```bash
 cd backend
 pytest
+ruff check .
+mypy .
 ```
 
 ---
 
-# Documentation Audit
+# Development Phase
 
-Current audit focuses on:
-
-- Day 1
-- Day 2
-- Day 3
-
-Day 4+ development will begin only after successful verification.
+Current focus is on finalizing the async processing integration, validating Celery task workflows, and preparing the Semantic Search & AI Ranking capabilities.
 
 ---
 
 # Roadmap
 
 - ✅ Phase 1 – Foundation
-- 🔄 Phase 2 – Verification
-- ⏳ Phase 3 – Core APIs
-- ⏳ Phase 4 – AI Services
+- ✅ Phase 2 – Verification
+- ✅ Phase 3 – Core APIs & Async Pipeline
+- 🔄 Phase 4 – AI Services Integration
 - ⏳ Phase 5 – Frontend Features
 - ⏳ Phase 6 – Production Deployment
 

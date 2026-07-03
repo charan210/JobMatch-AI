@@ -44,6 +44,7 @@ async def async_engine() -> AsyncEngine:
 @pytest_asyncio.fixture(autouse=True)
 async def prepare_database(async_engine: AsyncEngine) -> None:
     async with async_engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
 
 
@@ -70,7 +71,7 @@ async def client(async_session: AsyncSession):
 
     app.dependency_overrides[get_db] = lambda: async_session
 
-    transport = ASGITransport(app=app)
+    transport = ASGITransport(app=app)  # type: ignore
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
 

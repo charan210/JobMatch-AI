@@ -12,6 +12,7 @@ try:
     celery_app: Celery = Celery(
         "app.tasks",
         broker=settings.CELERY_BROKER_URL,
+        include=["app.tasks.tasks"]
     )
     # Basic configuration; individual tasks may set retries/timeouts
     celery_app.conf.task_serializer = "json"

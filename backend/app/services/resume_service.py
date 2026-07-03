@@ -42,3 +42,7 @@ class ResumeService:
             page_params=page_params,
         )
         return paginated.items, paginated.total
+
+    async def update_resume_status(self, db: AsyncSession, resume_id: object, status: str) -> Resume:
+        resume = await self.get_resume(db, resume_id)
+        return await self.repository.update(db, resume, {"parsing_status": status})
