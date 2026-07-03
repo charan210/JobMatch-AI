@@ -114,6 +114,7 @@ def _register_routers(application: FastAPI) -> None:
     """
     from app.api.v1.health import router as health_router
     from app.api.v1.jobs import router as jobs_router
+    from app.api.v1.jobs_status import router as jobs_status_router
     from app.api.v1.candidates import router as candidates_router
     from app.api.v1.resumes import router as resumes_router
     from app.api.v1.rankings import router as rankings_router
@@ -122,6 +123,7 @@ def _register_routers(application: FastAPI) -> None:
 
     application.include_router(health_router)
     application.include_router(jobs_router)
+    application.include_router(jobs_status_router)
     application.include_router(candidates_router)
     application.include_router(resumes_router)
     application.include_router(rankings_router)
