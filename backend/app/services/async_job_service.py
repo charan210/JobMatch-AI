@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from typing import Any
 from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,6 +13,12 @@ from app.core.exceptions import NotFoundError
 class AsyncJobService:
     def __init__(self) -> None:
         self.repository = AsyncJobRepository(AsyncJob)
+
+    async def create_job(self, db: AsyncSession, job_data: dict[str, Any]) -> AsyncJob:
+        """
+        Create a new async job.
+        """
+        return await self.repository.create(db, job_data)
 
     async def get_job(self, db: AsyncSession, job_id: str | UUID) -> AsyncJob:
         """
@@ -43,6 +50,6 @@ class AsyncJobService:
         if error_message:
             update_data["error_message"] = error_message
         if result_json:
-            update_data["result_json"] = result_json
+            update_data["result_json"] = result_json  # type: ignore
             
         return await self.repository.update(db, job, update_data)

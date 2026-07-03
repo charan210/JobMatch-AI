@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status, UploadFile, File, Form
+from fastapi import APIRouter, Depends, HTTPException, Query, status, UploadFile, File, Form, BackgroundTasks
 from pydantic import BaseModel, ConfigDict
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -12,6 +12,8 @@ from app.db.database import get_db
 from app.repositories.exceptions import NotFoundError
 from app.services.resume_service import ResumeService
 from app.services.storage_service import StorageBackend, get_storage_service
+from app.services.async_job_service import AsyncJobService
+from app.tasks.tasks import parse_resume_task
 
 logger = get_logger(__name__)
 router = APIRouter(prefix="/resumes", tags=["Resumes"])
@@ -41,17 +43,23 @@ def get_resume_service() -> ResumeService:
     return ResumeService()
 
 
+def get_async_job_service() -> AsyncJobService:
+    return AsyncJobService()
+
+
 ALLOWED_MIME_TYPES = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
 MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
 
 
 @router.post("/upload", response_model=ResumeCreateResponse, status_code=status.HTTP_202_ACCEPTED)
 async def upload_resume(
+    background_tasks: BackgroundTasks,
     candidate_id: UUID = Form(...),
     file: UploadFile = File(...),
     db: AsyncSession = Depends(get_db),
     resume_service: ResumeService = Depends(get_resume_service),
     storage_service: StorageBackend = Depends(get_storage_service),
+    async_job_service: AsyncJobService = Depends(get_async_job_service),
 ) -> ResumeCreateResponse:
     logger.info("upload_resume_request_received", candidate_id=str(candidate_id), file_name=file.filename)
     
@@ -84,6 +92,22 @@ async def upload_resume(
         "parsing_status": "PENDING"
     }
     resume = await resume_service.create_resume(db, resume_data)
+    
+    # Create AsyncJob
+    job_data = {
+        "job_type": "parse_resume",
+        "entity_type": "resume",
+        "entity_id": str(resume.id),
+        "status": "QUEUED"
+    }
+    async_job = await async_job_service.create_job(db, job_data)
+
+    # Dispatch to Celery
+    background_tasks.add_task(
+        parse_resume_task.apply_async,
+        args=[str(async_job.id), str(resume.id)],
+        queue="ai"
+    )
     
     return ResumeCreateResponse(resume_id=resume.id, status="uploaded")
 
