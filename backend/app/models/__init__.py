@@ -16,6 +16,8 @@ from app.models.job_embedding import JobEmbedding
 
 from app.models.candidate_score import CandidateScore
 from app.models.audit_log import AuditLog
+from app.models.ai_summary import AISummary
+from app.models.async_job import AsyncJob
 
 __all__ = [
     "Base",
@@ -30,4 +32,6 @@ __all__ = [
     "JobEmbedding",
     "CandidateScore",
     "AuditLog",
+    "AISummary",
+    "AsyncJob",
 ]

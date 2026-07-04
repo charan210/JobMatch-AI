@@ -151,9 +151,55 @@ if celery_app is not None:
 
         return asyncio.get_event_loop().run_until_complete(_run())
 
+    @celery_app.task(name="app.tasks.generate_ai_artifacts")
+    def generate_ai_artifacts_task(async_job_id: str, candidate_id: str, job_id: str) -> dict[str, Any]:
+        from app.db.database import get_db_context
+        from app.services.async_job_service import AsyncJobService
+        from app.services.ai_pipeline_service import AIPipelineService
+        import uuid
+        import asyncio
+
+        async def _run() -> dict[str, Any]:
+            async with get_db_context() as db:
+                job_svc = AsyncJobService()
+                
+                try:
+                    job = await job_svc.get_job(db, async_job_id)
+                except Exception:
+                    return {"status": "job_not_found"}
+
+                if job.status == "COMPLETED":
+                    return {"status": "already_completed"}
+                
+                await job_svc.update_job(
+                    db, 
+                    job_id=async_job_id, 
+                    status="STARTED", 
+                    celery_task_id=generate_ai_artifacts_task.request.id  # type: ignore
+                )
+
+                pipeline_svc = AIPipelineService()
+                try:
+                    result = await pipeline_svc.execute_pipeline(
+                        db, 
+                        async_job_id=async_job_id, 
+                        candidate_id=uuid.UUID(candidate_id), 
+                        job_id=uuid.UUID(job_id)
+                    )
+                    return {"status": "completed", "result": result}
+                except Exception as exc:
+                    logger.error("generate_ai_artifacts_failed", async_job_id=async_job_id, error=str(exc))
+                    # Pipeline service already updates the job status to FAILED
+                    return {"status": "failed", "error": str(exc)}
+
+        return asyncio.get_event_loop().run_until_complete(_run())
+
 else:
     def generate_ranking_task(*args: Any, **kwargs: Any) -> dict[str, Any]:
         raise RuntimeError("Celery is not configured.")
         
     def parse_resume_task(*args: Any, **kwargs: Any) -> dict[str, Any]:
+        raise RuntimeError("Celery is not configured.")
+
+    def generate_ai_artifacts_task(*args: Any, **kwargs: Any) -> dict[str, Any]:
         raise RuntimeError("Celery is not configured.")

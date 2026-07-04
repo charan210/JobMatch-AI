@@ -63,7 +63,10 @@ async def create_job(
     service: JobService = Depends(get_job_service),
 ) -> JobCreateResponse:
     logger.info("create_job_request_received", recruiter_id=str(payload.recruiter_id))
-    job = await service.create_job(db, payload.model_dump(exclude_none=True))
+    try:
+        job = await service.create_job(db, payload.model_dump(exclude_none=True))
+    except NotFoundError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.message)
     return JobCreateResponse(job_id=job.id, status="created")
 
 

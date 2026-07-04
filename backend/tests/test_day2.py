@@ -6,8 +6,9 @@ from fastapi.testclient import TestClient
 from app.main import app
 
 
+from typing import Generator
 @pytest.fixture(scope="module")
-def client() -> TestClient:
+def client() -> Generator[TestClient, None, None]:
     """Module-scoped TestClient — starts app once for all tests in this file."""
     with TestClient(app, raise_server_exceptions=True) as c:
         yield c

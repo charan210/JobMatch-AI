@@ -1,0 +1,35 @@
+{
+    "questions": [
+        {
+            "question": "Can you describe a time when you had to learn a new technology or framework quickly to complete a project?",
+            "category": "Behavioral",
+            "difficulty": "Medium",
+            "expected_skill": "Adaptability"
+        },
+        {
+            "question": "How do you approach solving a complex technical problem when you are unfamiliar with the underlying system?",
+            "category": "Behavioral",
+            "difficulty": "Medium",
+            "expected_skill": "Problem Solving"
+        },
+        {
+            "question": "What is your process for debugging an issue in a production environment?",
+            "category": "Technical",
+            "difficulty": "Medium",
+            "expected_skill": "Debugging"
+        },
+        {
+            "question": "Can you explain a fundamental concept in your primary programming language that you think is often misunderstood?",
+            "category": "Technical",
+            "difficulty": "Medium",
+            "expected_skill": "Core Concepts"
+        },
+        {
+            "question": "How do you ensure your code is scalable and maintainable?",
+            "category": "Architecture",
+            "difficulty": "Hard",
+            "expected_skill": "System Design"
+        }
+    ],
+    "is_fallback": true
+}

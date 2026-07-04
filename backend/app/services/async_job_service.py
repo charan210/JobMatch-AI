@@ -36,7 +36,7 @@ class AsyncJobService:
         status: str,
         celery_task_id: str | None = None,
         error_message: str | None = None,
-        result_json: dict | None = None,
+        result_json: dict[str, Any] | None = None,
     ) -> AsyncJob:
         from sqlalchemy import func
         job = await self.get_job(db, job_id)
