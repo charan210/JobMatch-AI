@@ -26,6 +26,69 @@ class AIPipelineService:
         self.summary_service = SummaryService()
         self.interview_service = InterviewQuestionService()
 
+    async def check_idempotency(self, db: AsyncSession, candidate_id: uuid.UUID, job_id: uuid.UUID) -> dict[str, Any] | None:
+        """Check if an AI generation job is already running or completed for this candidate and job."""
+        # Check if completed
+        existing_summary = await self.summary_persistence.get_summary(db, candidate_id, job_id)
+        if existing_summary:
+            return {"status": "COMPLETED", "job_id": None}
+            
+        # Check if running
+        payload_match = {"candidate_id": str(candidate_id), "job_id": str(job_id)}
+        query = select(self.async_job_service.repository.model).where(
+            self.async_job_service.repository.model.job_type == "ai_generation",
+            self.async_job_service.repository.model.status.in_(["PENDING", "QUEUED", "STARTED", "PROCESSING_SKILL_GAP", "PROCESSING_SUMMARY", "PROCESSING_INTERVIEW"])
+        )
+        result = await db.execute(query)
+        running_jobs = result.scalars().all()
+        
+        for job in running_jobs:
+            if job.payload_json == payload_match:
+                return {"status": job.status, "job_id": job.id}
+                
+        return None
+
+    async def get_interview_questions(self, db: AsyncSession, candidate_id: uuid.UUID, job_id: uuid.UUID) -> dict[str, Any] | None:
+        """Retrieve interview questions. For now, this extracts them from the most recent AsyncJob result."""
+        payload_match = {"candidate_id": str(candidate_id), "job_id": str(job_id)}
+        query = select(self.async_job_service.repository.model).where(
+            self.async_job_service.repository.model.job_type == "ai_generation",
+            self.async_job_service.repository.model.status == "COMPLETED"
+        ).order_by(self.async_job_service.repository.model.created_at.desc())
+        
+        result = await db.execute(query)
+        completed_jobs = result.scalars().all()
+        
+        for job in completed_jobs:
+            if job.payload_json == payload_match and job.result_json:
+                return job.result_json.get("interview_questions")
+                
+        return None
+
+    async def get_skill_gap(self, db: AsyncSession, candidate_id: uuid.UUID, job_id: uuid.UUID) -> dict[str, Any]:
+        """Compute or retrieve the skill gap analysis dynamically."""
+        candidate = await self.candidate_service.get_candidate(db, candidate_id)
+        job = await self.job_service.get_job(db, job_id)
+        
+        if not candidate or not job:
+            raise ValueError("Candidate or Job not found")
+
+        candidate_profile = {
+            "id": str(candidate.id),
+            "experience_years": candidate.experience_years,
+            "education": candidate.education,
+            "skills": [s.skill.name for s in candidate.candidate_skills] if hasattr(candidate, "candidate_skills") and candidate.candidate_skills else []
+        }
+        job_profile = {
+            "id": str(job.id),
+            "title": job.title,
+            "experience_required": job.experience_required,
+            "education_required": job.education_required,
+            "skills": [s.skill.name for s in job.job_skills] if hasattr(job, "job_skills") and job.job_skills else []
+        }
+        
+        return self.skill_gap_service.analyze(candidate_profile, job_profile)
+
     async def execute_pipeline(self, db: AsyncSession, async_job_id: str, candidate_id: uuid.UUID, job_id: uuid.UUID) -> dict[str, Any]:
         logger.info("ai_pipeline_started", async_job_id=async_job_id, candidate_id=str(candidate_id), job_id=str(job_id))
         

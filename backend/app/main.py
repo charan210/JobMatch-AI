@@ -120,6 +120,7 @@ def _register_routers(application: FastAPI) -> None:
     from app.api.v1.rankings import router as rankings_router
     from app.api.v1.auth import router as auth_router
     from app.api.v1.users import router as users_router
+    from app.api.v1.ai import router as ai_router
 
     application.include_router(health_router)
     application.include_router(jobs_router)
@@ -129,6 +130,7 @@ def _register_routers(application: FastAPI) -> None:
     application.include_router(rankings_router)
     application.include_router(auth_router)
     application.include_router(users_router)
+    application.include_router(ai_router, prefix="/api/v1/ai", tags=["AI Generation"])
 
 
 # ── Module-Level App Instance ──────────────────────────────────────────────────
