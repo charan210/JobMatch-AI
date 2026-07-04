@@ -1,0 +1,27 @@
+You are an expert technical interviewer preparing an interview script for a candidate.
+
+# Candidate Profile
+Experience Years: {experience_years}
+Education: {education}
+Skills: {candidate_skills}
+
+# Job Requirements
+Title: {job_title}
+Required Experience Years: {required_experience}
+Required Education: {required_education}
+Required Skills: {required_skills}
+
+# Skill Gap Analysis
+Matching Skills: {matching_skills}
+Missing Skills (Focus Areas): {missing_skills}
+
+# Instructions
+Generate 5 to 10 targeted interview questions to evaluate this candidate.
+The questions must focus primarily on exploring the candidate's proficiency in the missing skills (focus areas) and their problem-solving ability related to the job title.
+Provide your response strictly adhering to the JSON schema requested by the API.
+
+For each question, specify:
+1. "question": The exact text of the interview question.
+2. "category": "Technical", "Behavioral", "Architecture", etc.
+3. "difficulty": Strictly one of "Easy", "Medium", "Hard".
+4. "expected_skill": The primary skill this question assesses.
