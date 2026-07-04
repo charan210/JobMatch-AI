@@ -1,0 +1,108 @@
+{
+  "environment": {
+    "postgres": "UP",
+    "redis": "UP",
+    "gemini": "CONFIGURED"
+  },
+  "authentication": {},
+  "coverage": [
+    {
+      "name": "Register",
+      "endpoint": "/api/v1/auth/register",
+      "method": "POST",
+      "status_code": 422,
+      "duration": 0.026061534881591797,
+      "result": "FAIL",
+      "response": "{\"success\":false,\"message\":\"Request validation failed.\",\"errors\":[{\"field\":\"body \u2192 name\",\"message\":\"Field required\"},{\"field\":\"body \u2192 first_name\",\"message\":\"Extra inputs are not permitted\"},{\"field\":\""
+    },
+    {
+      "name": "Login",
+      "endpoint": "/api/v1/auth/login",
+      "method": "POST",
+      "status_code": 422,
+      "duration": 0.012678861618041992,
+      "result": "FAIL",
+      "response": "{\"success\":false,\"message\":\"Request validation failed.\",\"errors\":[{\"field\":\"body \u2192 email\",\"message\":\"Field required\"},{\"field\":\"body \u2192 username\",\"message\":\"Extra inputs are not permitted\"}]}"
+    },
+    {
+      "name": "Health Base",
+      "endpoint": "/health",
+      "method": "GET",
+      "status_code": 200,
+      "duration": 0.00467991828918457,
+      "result": "PASS",
+      "response": "{\"status\":\"healthy\"}"
+    },
+    {
+      "name": "Health Detailed",
+      "endpoint": "/api/v1/health/detailed",
+      "method": "GET",
+      "status_code": 200,
+      "duration": 0.02753138542175293,
+      "result": "PASS",
+      "response": "{\"status\":\"healthy\",\"database\":\"healthy\",\"version\":\"1.0.0\",\"environment\":\"development\",\"timestamp\":\"2026-07-04T13:48:54.833254+00:00\"}"
+    },
+    {
+      "name": "Get Me",
+      "endpoint": "/api/v1/users/me",
+      "method": "GET",
+      "status_code": 401,
+      "duration": 0.0050830841064453125,
+      "result": "FAIL",
+      "response": "{\"success\":false,\"message\":\"Not authenticated\",\"errors\":[]}"
+    },
+    {
+      "name": "Create Job",
+      "endpoint": "/jobs",
+      "method": "POST",
+      "status_code": 422,
+      "duration": 0.00860905647277832,
+      "result": "FAIL",
+      "response": "{\"success\":false,\"message\":\"Request validation failed.\",\"errors\":[{\"field\":\"body \u2192 recruiter_id\",\"message\":\"Field required\"}]}"
+    },
+    {
+      "name": "List Jobs",
+      "endpoint": "/jobs",
+      "method": "GET",
+      "status_code": 200,
+      "duration": 0.04662060737609863,
+      "result": "PASS",
+      "response": "[{\"id\":\"e7e5ddda-c91e-43a3-8e9d-88315221fa04\",\"recruiter_id\":\"510e6010-b03e-41dc-8438-f31cdf56fca2\",\"title\":\"Data Scientist\",\"description\":\"Full job description\\nID: JPD26\\nActive\\nTISSA Technology\u00b7Pu"
+    },
+    {
+      "name": "Create Candidate",
+      "endpoint": "/candidates",
+      "method": "POST",
+      "status_code": 422,
+      "duration": 5.311965227127075,
+      "result": "FAIL",
+      "response": "{\"success\":false,\"message\":\"Request validation failed.\",\"errors\":[{\"field\":\"body \u2192 full_name\",\"message\":\"Field required\"}]}"
+    },
+    {
+      "name": "List Candidates",
+      "endpoint": "/candidates",
+      "method": "GET",
+      "status_code": 200,
+      "duration": 0.15571331977844238,
+      "result": "PASS",
+      "response": "[{\"id\":\"dd410e1a-433f-4a31-9afb-787720e0f077\",\"full_name\":\"QA Candidate\",\"email\":\"cand_bfb4d38d-2a5a-444d-ae3b-23264f4873a8@example.com\",\"phone\":\"9865436754\",\"linkedin_url\":\"linkedin.com/in/rohit-khan"
+    },
+    {
+      "name": "List Resumes",
+      "endpoint": "/resumes",
+      "method": "GET",
+      "status_code": 200,
+      "duration": 0.03453493118286133,
+      "result": "PASS",
+      "response": "[{\"id\":\"bae2a75a-8f89-4230-b9dc-40c89ca17f4e\",\"candidate_id\":\"dd410e1a-433f-4a31-9afb-787720e0f077\",\"file_name\":\"sample_resume.pdf\",\"file_url\":\"uploads\\\\49323e6d8044400d825fd345dff0bcfa_sample_resume."
+    }
+  ],
+  "performance": {},
+  "database": {},
+  "async_pipeline": {},
+  "security": [],
+  "bugs": [],
+  "warnings": [],
+  "passed": 0,
+  "failed": 0
+}

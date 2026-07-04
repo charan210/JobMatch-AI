@@ -52,6 +52,7 @@ async def test_generate_ranking_creates_async_job_and_queues(async_session: Asyn
     async_job = await async_session.get(AsyncJob, data["job_id"])
     assert async_job is not None
     assert async_job.status in ("PENDING", "QUEUED")
+    assert async_job.payload_json is not None
     assert async_job.payload_json["job_id"] == str(job.id)
 
     # No candidate_scores should be created synchronously

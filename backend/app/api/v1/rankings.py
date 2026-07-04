@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from typing import Any
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -13,9 +14,6 @@ from app.repositories.candidate_score_repository import CandidateScoreRepository
 
 logger = get_logger(__name__)
 router = APIRouter(prefix="/rankings", tags=["Rankings"])
-
-
-from typing import Any
 
 @router.post("/generate/{job_id}", status_code=status.HTTP_202_ACCEPTED)
 async def generate_ranking(job_id: UUID, db: AsyncSession = Depends(get_db)) -> dict[str, Any]:
@@ -61,6 +59,7 @@ async def generate_ranking(job_id: UUID, db: AsyncSession = Depends(get_db)) -> 
         # leave job as PENDING and inform caller that async worker is not configured
         return {"success": False, "message": "Async worker not configured", "data": {"job_id": async_job.id, "status": async_job.status}}
 
+    await db.commit()
     celery_result = generate_ranking_task.apply_async(args=[async_job.id, str(job_id)])
     # update async job with celery task id and queued status
     async_job.celery_task_id = celery_result.id
@@ -73,7 +72,6 @@ async def generate_ranking(job_id: UUID, db: AsyncSession = Depends(get_db)) -> 
 @router.get("/{job_id}", status_code=status.HTTP_200_OK)
 async def get_rankings(job_id: UUID, db: AsyncSession = Depends(get_db)) -> list[dict[str, Any]]:
     # Returns persisted candidate_scores for a job sorted by final_score desc
-    repo = CandidateScoreRepository()
     from sqlalchemy import text
     query = await db.execute(
         text("SELECT * FROM candidate_scores WHERE job_id = :job_id ORDER BY final_score DESC, candidate_id ASC"),

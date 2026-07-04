@@ -62,6 +62,7 @@ async def test_generate_ranking_task_success(monkeypatch, async_session: AsyncSe
     assert result["status"] == "completed"
 
     refreshed = await async_session.get(AsyncJob, async_job_id)
+    assert refreshed is not None
     assert refreshed.status == "COMPLETED"
     assert refreshed.result_json == {"message": "ranking_complete"}
     assert refreshed.celery_task_id == "test-task-id"
@@ -111,6 +112,7 @@ async def test_generate_ranking_task_failure(monkeypatch, async_session: AsyncSe
         await generate_ranking_task(async_job_id, job_id)
 
     refreshed = await async_session.get(AsyncJob, async_job_id)
+    assert refreshed is not None
     assert refreshed.status == "FAILED"
     assert refreshed.error_message == "ranking failed"
 

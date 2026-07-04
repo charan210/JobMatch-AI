@@ -30,7 +30,8 @@ class SkillExtractor(BaseExtractor):
     def _load_skills(self, path: str) -> list[str]:
         try:
             with open(path, "r", encoding="utf-8") as f:
-                return json.load(f)
+                from typing import cast
+                return cast(list[str], json.load(f))
         except Exception as e:
             raise ExtractorError(f"Failed to load skills from {path}: {str(e)}") from e
 

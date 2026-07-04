@@ -1,0 +1,20 @@
+Full job description
+ID: JPD26
+Active
+TISSA Technology·Pune, India (Onsite)·Full-time·Bachelor's in Computer Science, IT, or related field (or pursuing)
+We are looking for a motivated Junior Python Developer to support the development of backend applications and APIs. This role is ideal for freshers or early-career professionals eager to grow their skills while working on real-world projects under the guidance of experienced developers.
+
+Requirements
+0-2 years of experience in Python development (freshers welcome) with a basic understanding of backend development concepts. Strong willingness to learn, adapt, and grow in a professional development environment.
+
+Job Description
+As a Junior Python Developer at TISSA Technology, you will assist in building and maintaining backend features, support API development, and help improve existing applications. You will collaborate closely with senior developers, gain hands-on experience, and learn industry best practices.
+
+Responsibilities
+Assist in developing backend features using Python
+Support REST API development and third-party integrations
+Write clean, readable, and well-documented code
+Fix bugs and support application enhancements
+Collaborate with senior developers and learn best practices
+Required Skills
+Python (0-2 Years)Flask / Django / FastAPI (Basic)REST API FundamentalsMySQL / PostgreSQL (Basic)Git & Version Control BasicsProblem-Solving & Learning Mindset

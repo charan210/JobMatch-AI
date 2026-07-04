@@ -98,7 +98,7 @@ class Settings(BaseSettings):
     CELERY_BROKER_URL: str = Field(default="redis://localhost:6379/0")
 
     # ── AI Engine (Milestone 2) ────────────────────────────────────────────────
-    GEMINI_API_KEY: str = Field(default="")
+    GEMINI_API_KEY: str 
     GEMINI_MODEL: str = Field(default="gemini-2.5-flash")
 
     # ── Storage (Milestone 1) ───────────────────────────────────────────────────

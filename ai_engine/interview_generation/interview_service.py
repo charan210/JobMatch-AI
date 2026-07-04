@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 import json
 from functools import lru_cache
-from pydantic import ValidationError
+from pydantic import ValidationError, BaseModel
 from typing import Any
 
 from app.core.gemini_client import GeminiClient, GeminiClientException
@@ -98,7 +98,10 @@ class InterviewQuestionService:
                 missing_skills=", ".join(skill_gap_result.get("missing_skills", [])),
             )
             
-            response_schema = InterviewQuestionResponse.model_json_schema()
+            class GeminiInterviewQuestionResponse(BaseModel):
+                questions: list[InterviewQuestion]
+
+            response_schema = GeminiInterviewQuestionResponse.model_json_schema()
             
             raw_json = await self.client.generate_json(
                 prompt=prompt,
@@ -108,9 +111,10 @@ class InterviewQuestionService:
             if not isinstance(raw_json, dict):
                 raise ValueError("Gemini client returned non-dictionary output")
 
-            # Validate with Pydantic and safely set immutable fallback flag
-            validated = InterviewQuestionResponse.model_validate(raw_json)
-            validated = validated.model_copy(update={"is_fallback": False})
+            # Map the parsed JSON back into our actual application schema 
+            # We use the Gemini schema to strictly validate what Gemini returned
+            gemini_validated = GeminiInterviewQuestionResponse.model_validate(raw_json)
+            validated = InterviewQuestionResponse(questions=gemini_validated.questions, is_fallback=False)
             
             logger.info("interview_generation_completed", candidate_id=candidate_id, job_id=job_id)
             return validated

@@ -114,7 +114,7 @@ async def test_get_skill_gap(mock_get_skill_gap, client: AsyncClient, auth_heade
     mock_get_skill_gap.return_value = {
         "matching_skills": ["Python"],
         "missing_skills": ["Docker"],
-        "matching_percentage": 50.0
+        "match_percentage": 50.0
     }
     
     response = await client.get(
@@ -122,4 +122,4 @@ async def test_get_skill_gap(mock_get_skill_gap, client: AsyncClient, auth_heade
         headers=auth_header
     )
     assert response.status_code == 200
-    assert response.json()["matching_percentage"] == 50.0
+    assert response.json()["match_percentage"] == 50.0

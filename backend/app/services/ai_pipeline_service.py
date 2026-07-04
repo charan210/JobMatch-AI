@@ -73,21 +73,40 @@ class AIPipelineService:
         if not candidate or not job:
             raise ValueError("Candidate or Job not found")
 
+        from sqlalchemy.orm import selectinload
+        from app.models.candidate_skill import CandidateSkill
+        from app.models.job_skill import JobSkill
+
+        c_skills_result = await db.execute(
+            select(CandidateSkill).options(selectinload(CandidateSkill.skill)).where(CandidateSkill.candidate_id == candidate_id)
+        )
+        c_skills = [cs.skill.skill_name for cs in c_skills_result.scalars().all()]
+
+        j_skills_result = await db.execute(
+            select(JobSkill).options(selectinload(JobSkill.skill)).where(JobSkill.job_id == job_id)
+        )
+        j_skills = [js.skill.skill_name for js in j_skills_result.scalars().all()]
+
         candidate_profile = {
             "id": str(candidate.id),
             "experience_years": candidate.experience_years,
             "education": candidate.education,
-            "skills": [s.skill.name for s in candidate.candidate_skills] if hasattr(candidate, "candidate_skills") and candidate.candidate_skills else []
+            "skills": c_skills
         }
         job_profile = {
             "id": str(job.id),
             "title": job.title,
             "experience_required": job.experience_required,
             "education_required": job.education_required,
-            "skills": [s.skill.name for s in job.job_skills] if hasattr(job, "job_skills") and job.job_skills else []
+            "skills": j_skills
         }
         
-        return self.skill_gap_service.analyze(candidate_profile, job_profile)
+        from dataclasses import asdict
+        from typing import cast
+        c_skills = cast(list[str], candidate_profile["skills"])
+        j_skills = cast(list[str], job_profile["skills"])
+        result_obj = self.skill_gap_service.analyze(c_skills, j_skills)
+        return asdict(result_obj)
 
     async def execute_pipeline(self, db: AsyncSession, async_job_id: str, candidate_id: uuid.UUID, job_id: uuid.UUID) -> dict[str, Any]:
         logger.info("ai_pipeline_started", async_job_id=async_job_id, candidate_id=str(candidate_id), job_id=str(job_id))
@@ -97,18 +116,32 @@ class AIPipelineService:
             candidate = await self.candidate_service.get_candidate(db, candidate_id)
             job = await self.job_service.get_job(db, job_id)
 
+            from sqlalchemy.orm import selectinload
+            from app.models.candidate_skill import CandidateSkill
+            from app.models.job_skill import JobSkill
+
+            c_skills_result = await db.execute(
+                select(CandidateSkill).options(selectinload(CandidateSkill.skill)).where(CandidateSkill.candidate_id == candidate_id)
+            )
+            c_skills = [cs.skill.skill_name for cs in c_skills_result.scalars().all()]
+
+            j_skills_result = await db.execute(
+                select(JobSkill).options(selectinload(JobSkill.skill)).where(JobSkill.job_id == job_id)
+            )
+            j_skills = [js.skill.skill_name for js in j_skills_result.scalars().all()]
+
             candidate_profile = {
                 "id": str(candidate.id),
                 "experience_years": candidate.experience_years,
                 "education": candidate.education,
-                "skills": [s.skill.name for s in candidate.candidate_skills] if hasattr(candidate, "candidate_skills") and candidate.candidate_skills else []
+                "skills": c_skills
             }
             job_profile = {
                 "id": str(job.id),
                 "title": job.title,
                 "experience_required": job.experience_required,
                 "education_required": job.education_required,
-                "skills": [s.skill.name for s in job.job_skills] if hasattr(job, "job_skills") and job.job_skills else []
+                "skills": j_skills
             }
 
             # 2. Check existing (Idempotency)
@@ -116,7 +149,12 @@ class AIPipelineService:
             
             # 3. Skill Gap
             await self.async_job_service.update_job(db, async_job_id, status="PROCESSING_SKILL_GAP")
-            skill_gap_result = self.skill_gap_service.analyze(candidate_profile, job_profile)
+            from dataclasses import asdict
+            from typing import cast
+            c_skills = cast(list[str], candidate_profile["skills"])
+            j_skills = cast(list[str], job_profile["skills"])
+            skill_gap_result_obj = self.skill_gap_service.analyze(c_skills, j_skills)
+            skill_gap_result = asdict(skill_gap_result_obj)
             logger.info("skill_gap_completed", async_job_id=async_job_id)
 
             # 4. Summary

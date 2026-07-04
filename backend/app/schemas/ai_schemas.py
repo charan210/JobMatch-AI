@@ -55,4 +55,4 @@ class AIGenerateResponse(BaseModel):
 class SkillGapResponse(BaseModel):
     matching_skills: list[str] = Field(..., description="Skills present in both candidate and job.")
     missing_skills: list[str] = Field(..., description="Skills required by the job but missing from the candidate.")
-    matching_percentage: float = Field(..., description="Percentage of required skills the candidate possesses.")
+    match_percentage: float = Field(..., description="Percentage of required skills the candidate possesses.")

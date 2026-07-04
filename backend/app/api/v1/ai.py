@@ -73,12 +73,17 @@ async def generate_ai_artifacts(
     }
     async_job = await async_job_service.create_job(
         db,
-        job_type="ai_generation",
-        payload=payload,
-        requested_by=str(current_user.id),
+        job_data={
+            "job_type": "ai_generation",
+            "entity_type": "candidate",
+            "entity_id": str(request.candidate_id),
+            "status": "PENDING",
+            "payload_json": payload
+        }
     )
 
     # Enqueue task
+    await db.commit()
     generate_ai_artifacts_task.delay(async_job.id, str(request.candidate_id), str(request.job_id))
 
     return AIGenerateResponse(
