@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import JSONB
@@ -22,6 +22,8 @@ def test_day3_tables_registered() -> None:
     }
     # async_jobs table introduced in Sprint 5 Phase 2
     expected.add("async_jobs")
+    # ai_summaries table introduced in Sprint 6
+    expected.add("ai_summaries")
 
     assert set(Base.metadata.tables) == expected
 

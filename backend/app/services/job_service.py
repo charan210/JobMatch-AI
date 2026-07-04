@@ -11,10 +11,23 @@ from app.repositories.sort import SortOrder, SortParams
 
 
 class JobService:
-    def __init__(self, repository: JobRepository | None = None) -> None:
+    def __init__(
+        self,
+        repository: JobRepository | None = None,
+        user_repository: Any | None = None,
+    ) -> None:
         self.repository = repository or JobRepository()
+        
+        # Avoid circular imports if needed, but import here for clarity
+        from app.repositories.user_repository import UserRepository
+        self.user_repository = user_repository or UserRepository()
 
     async def create_job(self, db: AsyncSession, job_data: dict[str, Any]) -> Job:
+        # Validate recruiter existence before persistence to prevent IntegrityError
+        recruiter_id = job_data.get("recruiter_id")
+        if recruiter_id:
+            await self.user_repository.get_by_id_or_raise(db, recruiter_id)
+            
         sanitized_data = {k: v for k, v in job_data.items() if v is not None}
         return await self.repository.create(db, sanitized_data)
 

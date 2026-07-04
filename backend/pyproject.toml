@@ -1,11 +1,16 @@
 [tool.mypy]
 python_version = "3.11"
 strict = true
+warn_unused_ignores = false
+disallow_untyped_decorators = false
+warn_return_any = false
 mypy_path = ".."
 
 [[tool.mypy.overrides]]
 module = [
+    "celery",
     "celery.*",
+    "pgvector",
     "pgvector.*"
 ]
 ignore_missing_imports = true

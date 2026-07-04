@@ -36,7 +36,6 @@ class SkillGapService:
             )
 
         matching = normalized_required.intersection(normalized_candidate)
-        missing = normalized_required.difference(normalized_candidate)
 
         match_percentage = round((len(matching) / len(normalized_required)) * 100.0, 2)
 

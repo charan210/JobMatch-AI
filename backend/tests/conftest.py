@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import AsyncGenerator
 
 import asyncio
 import os
@@ -27,7 +28,7 @@ def event_loop_policy() -> asyncio.AbstractEventLoopPolicy:
 
 
 @pytest_asyncio.fixture
-async def async_engine() -> AsyncEngine:
+async def async_engine() -> AsyncGenerator[AsyncEngine, None]:
     pytest.importorskip("asyncpg")
     settings = Settings()
     database_url = os.getenv("DATABASE_URL", settings.DATABASE_URL)
@@ -49,7 +50,7 @@ async def prepare_database(async_engine: AsyncEngine) -> None:
 
 
 @pytest_asyncio.fixture
-async def async_session(async_engine: AsyncEngine) -> AsyncSession:
+async def async_session(async_engine: AsyncEngine) -> AsyncGenerator[AsyncSession, None]:
     maker = async_sessionmaker(async_engine, expire_on_commit=False, class_=AsyncSession)
     async with maker() as session:
         yield session

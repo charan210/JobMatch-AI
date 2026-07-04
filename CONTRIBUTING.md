@@ -22,11 +22,11 @@ Development follows the approved roadmap.
 
 Current Development Phase:
 
-- Core APIs Integration
-- AI Services & Celery Workers
-- Semantic Matching and Ranking
+- Frontend Features Integration
+- Candidate Dashboard
+- Recruiter Dashboard
 
-Focus on maintaining backend robustness and AI engine consistency.
+Focus on transitioning from backend processing to frontend user interfaces.
 
 ---
 
@@ -280,12 +280,14 @@ Completed
 ✔ Authentication & User Management
 ✔ Core APIs
 ✔ Async Processing Pipeline
+✔ AI Services (Skill Gap, Gemini Summaries, Interviews)
+✔ End-to-End Validation
 
 Current focus:
 
-• AI Services
-• Semantic Matching
-• Candidate Ranking
+• Frontend Integration
+• UI/UX Implementation
+• React Components
 
 ---
 
