@@ -8,7 +8,7 @@
 
 **Current Phase:** Core AI & Async Pipeline Development
 
-**Version:** v0.2.0
+**Version:** v0.5.0
 
 **Development Status:**
 
