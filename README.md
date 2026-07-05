@@ -6,7 +6,7 @@
 
 ## Project Status
 
-**Current Phase:** Core AI & Async Pipeline Development
+**Current Phase:** Phase 5 - Frontend Feature Integration
 
 **Version:** v0.5.0
 
@@ -22,6 +22,8 @@
 - ✅ PostgreSQL + pgvector Integration
 - ✅ AI Services (Summaries, Skill Gap, Interviews)
 - ✅ End-to-End API Validation
+- ✅ Frontend Architecture & Design System
+- ✅ Authentication UI & Routing
 
 ---
 
@@ -43,10 +45,12 @@
 - Docker Support
 - GitHub Actions CI
 - Comprehensive Project Documentation
+- React + TypeScript Frontend
+- Atomic Design System (TailwindCSS)
+- Authentication UI & Routing Shell
 
 ## Planned (Frontend Focus)
 
-- React + TypeScript Frontend
 - Job Description Analysis UI
 - Semantic Candidate Matching UI
 - AI Candidate Ranking Dashboard
@@ -242,6 +246,46 @@ Follow the guidelines in **CONTRIBUTING.md**.
 
 ---
 
+# Frontend Architecture
+
+The frontend application strictly adheres to a **Feature-Driven Clean Architecture**:
+- **Features**: Highly cohesive, decoupled modules (e.g., `auth`, `jobs`, `candidates`, `resumes`). Features do not import from other features.
+- **Shared Infrastructure**: Centralized UI components, layouts, hooks, API clients, and routing utilities.
+- **Routing**: Client-side routing managed by React Router.
+- **State**: Server-state handled by React Query. Auth state handled natively via React Context.
+- **Design System**: A shared atomic design system utilizing TailwindCSS and Lucide Icons.
+
+### Folder Structure
+
+```text
+frontend/src/
+├── features/          # Self-contained feature modules
+│   ├── auth/          # Authentication flows
+│   ├── dashboard/     # Dashboard shell
+│   ├── jobs/          # Job management
+│   ├── candidates/    # Candidate tracking
+│   └── resumes/       # AI resume parsing
+├── shared/            # Shared infrastructure
+│   ├── components/    # Atomic UI (buttons, inputs, cards)
+│   ├── hooks/         # Reusable custom hooks
+│   ├── layouts/       # Route layouts (DashboardLayout, AuthLayout)
+│   ├── lib/           # Third-party instance wrappers (React Query)
+│   ├── services/      # Axios instance, Token Management
+│   ├── types/         # Global types
+│   └── utils/         # Helper functions (cn)
+└── routes/            # Global App Router
+```
+
+### Authentication Flow
+
+Authentication is deeply integrated into the frontend shell:
+- **Registration**: Routes to backend `POST /api/v1/auth/register`. Payload strictly mandates `name`, `email`, and `password`.
+- **Login**: Acquires `access_token` and `refresh_token`. Tokens are persisted safely using the singleton `TokenManager`.
+- **Axios Interceptor**: `apiClient.ts` intercepts all requests, appending `Authorization: Bearer <token>`. 
+- **Session Persistence**: On hard refresh, `AuthContext` asynchronously rehydrates by pinging `/api/v1/users/me`. If a `401 Unauthorized` is encountered, tokens are purged locally and the user is redirected safely to `/login`.
+
+---
+
 # Testing
 
 Backend
@@ -257,7 +301,7 @@ mypy .
 
 # Development Phase
 
-Current focus is transitioning to the Frontend (Phase 5). The backend async processing integration (Celery), AI pipeline, and API validation are now fully completed and stabilized.
+Current focus is Frontend Feature Integration (Phase 5). The frontend foundation, authentication lifecycle, and routing shell are fully established, backed by the stabilized async AI pipeline on the backend.
 
 ---
 

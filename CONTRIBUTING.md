@@ -176,6 +176,25 @@ Every Pull Request must:
 - Avoid inline styles
 - Follow ESLint rules
 
+### Feature Module Rules
+1. **Isolation**: A feature must NEVER import from another feature's folder. If code is needed by multiple features, promote it to `src/shared/`.
+2. **Internal Structure**: Every feature should typically contain `api/`, `components/`, `hooks/`, `pages/`, `schemas/`, and `types/`.
+
+### Shared Component Rules
+- Place all reusable, presentation-only components in `src/shared/components/`.
+- Use atomic design principles (`ui/` for buttons/inputs, `feedback/` for loading/errors, `navigation/` for menus).
+- Do not inject business logic or API calls directly into shared UI components.
+
+### Routing Conventions
+- Global routing is configured exclusively in `src/routes/AppRouter.tsx`.
+- Use `<ProtectedRoute>` to guard authenticated domains.
+- Use `<PublicRoute>` to explicitly bounce authenticated users away from public pages (like `/login`).
+
+### Service Layer Rules
+- Do NOT use Axios directly in components.
+- All HTTP requests must go through the pre-configured `apiClient.ts` (which handles interceptors and timeouts).
+- `TokenManager` (`tokenManager.ts`) is the *single source of truth* for `localStorage`. Components and Hooks must never call `localStorage.getItem()` directly.
+
 ---
 
 # Testing
@@ -282,12 +301,14 @@ Completed
 ✔ Async Processing Pipeline
 ✔ AI Services (Skill Gap, Gemini Summaries, Interviews)
 ✔ End-to-End Validation
+✔ Frontend Integration & Foundation
+✔ UI/UX Design System Implementation
+✔ Authentication & Routing Components
 
 Current focus:
 
-• Frontend Integration
-• UI/UX Implementation
-• React Components
+• Jobs & Candidates Modules
+• React Query Data Fetching
+• AI Resume UI Integration
 
 ---
-
