@@ -1,11 +1,11 @@
 export interface User {
   id: string;
   email: string;
-  firstName?: string;
-  lastName?: string;
-  role: "admin" | "candidate" | "recruiter";
-  createdAt?: string;
-  updatedAt?: string;
+  name: string;
+  role: "admin" | "candidate" | "recruiter" | "user";
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface AuthTokens {
@@ -21,8 +21,7 @@ export interface LoginRequest {
 export interface RegisterRequest {
   email: string;
   password: string;
-  firstName?: string;
-  lastName?: string;
+  name: string;
 }
 
 export interface AuthState {

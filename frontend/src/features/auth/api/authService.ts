@@ -3,13 +3,13 @@ import { setAccessToken, setRefreshToken, removeTokens, hasAccessToken } from "@
 import type { LoginRequest, RegisterRequest, AuthTokens, User } from "../types/auth";
 
 export async function login(credentials: LoginRequest): Promise<void> {
-  const response = await apiClient.post<AuthTokens>("/api/v1/auth/login", credentials);
+  const response = await apiClient.post<AuthTokens>("auth/login", credentials);
   setAccessToken(response.data.access_token);
   setRefreshToken(response.data.refresh_token);
 }
 
 export async function register(data: RegisterRequest): Promise<User> {
-  const response = await apiClient.post<User>("/api/v1/auth/register", data);
+  const response = await apiClient.post<User>("auth/register", data);
   return response.data;
 }
 
@@ -20,7 +20,7 @@ export function logout(): void {
 }
 
 export async function getCurrentUser(): Promise<User> {
-  const response = await apiClient.get<User>("/api/v1/users/me");
+  const response = await apiClient.get<User>("users/me");
   return response.data;
 }
 
