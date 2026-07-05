@@ -33,8 +33,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
       await registerAction({
         email: data.email,
         password: data.password,
-        firstName: data.firstName || undefined,
-        lastName: data.lastName || undefined,
+        name: data.name,
       });
       reset();
       onSuccess();
@@ -57,29 +56,17 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
           <FormError message={authError} />
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="firstName">First Name (Optional)</Label>
-              <Input
-                id="firstName"
-                type="text"
-                placeholder="John"
-                autoComplete="given-name"
-                {...register("firstName")}
-                disabled={isSubmitting}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Last Name (Optional)</Label>
-              <Input
-                id="lastName"
-                type="text"
-                placeholder="Doe"
-                autoComplete="family-name"
-                {...register("lastName")}
-                disabled={isSubmitting}
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="name">Full Name</Label>
+            <Input
+              id="name"
+              type="text"
+              placeholder="John Doe"
+              autoComplete="name"
+              {...register("name")}
+              disabled={isSubmitting}
+            />
+            {errors.name && <p className="text-sm text-[hsl(var(--destructive))]">{errors.name.message}</p>}
           </div>
 
           <div className="space-y-2">
