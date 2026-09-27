@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # JobMatch AI
 
 ### AI-Powered Resume and Job Matching Platform
@@ -170,3 +171,7 @@ GitHub: [charan210](https://github.com/charan210)
 ## Project Status
 
 JobMatch AI is currently under development. Features listed as planned will be implemented and tested during the development process.
+=======
+# JobMatch-AI
+AI-powered resume and job matching platform that uses NLP, machine learning, and semantic search to analyze resumes, match job descriptions, and identify skill gaps.
+>>>>>>> 51df86d65ab47ed33f39d94632ff5ed5f298cdfe
